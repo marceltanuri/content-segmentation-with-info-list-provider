@@ -110,11 +110,9 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 			try {
 
 				String[] tagNames = new String[userTags.size()];
-				List<Object> tagNamesList = new ArrayList<Object>(userTags.size());
 				for (int i = 0; i < userTags.size(); i++) {
 					AssetTag assetTag = userTags.get(i);
 					tagNames[i] = assetTag.getName();
-					tagNamesList.add(assetTag.getName());
 				}
 
 				StringQuery assetTageNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
