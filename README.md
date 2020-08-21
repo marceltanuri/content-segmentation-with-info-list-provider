@@ -1,7 +1,7 @@
 ## Content segmentation with InfoListProvider
 
 
-Complex content segmentation needs can be solved by using InfoListProvider.
+Complex content segmentation needs in Liferay DXP 7.2 can be solved by using InfoListProvider.
 
 Basically, you just have to create an implementation of InfoListProvider, to declare the type of the contents in your list, and returning the desired list of contents using your own strategy of query.
 
