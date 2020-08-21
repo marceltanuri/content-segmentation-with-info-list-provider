@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = InfoListProvider.class)
 public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEntry> {
 
+	private static final String INFO_LIST_PROVIDER_NAME = "Principal Banner";
 	private static final String GLOBAL = "global";
 	private static final String GROUP_FIELD = "groupId";
 	private static final String SEGMENTADO = "segmentado";
@@ -256,6 +257,6 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 
 	@Override
 	public String getLabel(Locale locale) {
-		return "Landing Segmentada";
+		return INFO_LIST_PROVIDER_NAME;
 	}
 }
