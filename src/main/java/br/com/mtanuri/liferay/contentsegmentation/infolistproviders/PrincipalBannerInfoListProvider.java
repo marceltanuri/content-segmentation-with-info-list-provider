@@ -115,7 +115,7 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 					tagNames[i] = assetTag.getName();
 				}
 
-				StringQuery assetTageNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
+				StringQuery assetTagNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
 				MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
 				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
 				MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
@@ -128,7 +128,7 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 
 				BooleanQuery booleanQuery = queries.booleanQuery();
 				booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
-						assetCategoryQuery, assetTageNamesQuery);
+						assetCategoryQuery, assetTagNamesQuery);
 
 				SearchRequestBuilder searchRequestBuilder = searchRequestBuilderFactory.builder();
 
