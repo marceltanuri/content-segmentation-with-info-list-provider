@@ -19,9 +19,12 @@ Here is an example of a segmentation with the follow rules:
     -   4. If any of the conditions above were satisfied, so any JournalArticle will be displayed.
         
 
-I’ve been used elasticSearch queries instead of conventional SQL in order to gain better performance.
+Here is my example of code used to cover those rules.
+
+I’ve used elasticSearch queries instead of conventional SQL in order to gain better performance.
 
 Source:
+[https://github.com/marceltanuri/content-segmentation-with-info-list-provider](https://github.com/marceltanuri/content-segmentation-with-info-list-provider) 
 
 References:
 
