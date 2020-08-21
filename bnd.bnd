@@ -1,0 +1,3 @@
+Bundle-Name: content-segmentation-with-info-list-provider
+Bundle-SymbolicName: br.com.mtanuri.liferay.contentsegmentation.infolistproviders
+Bundle-Version: 1.0.0
