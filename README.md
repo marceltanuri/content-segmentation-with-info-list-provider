@@ -1,10 +1,11 @@
 ## Content segmentation with InfoListProvider
 
-Complex content segmentation rules can be achieved by using InfoListProvider.
 
-Basically, you just have to create your implementation of InfoListProvider, declaring the type of the contents in your list, and return the desired list of contents using your own strategy of query.
+Complex content segmentation needs can be solved by using InfoListProvider.
 
-Here is an example of a segmentation with the follow rules:
+Basically, you just have to create an implementation of InfoListProvider, to declare the type of the contents in your list, and returning the desired list of contents using your own strategy of query.
+
+Here is a real world scenario of content segmentation:
 
 -   General objective: Find the banner to be displayed in the principal portal page
     
@@ -18,13 +19,12 @@ Here is an example of a segmentation with the follow rules:
         
     -   4. If any of the conditions above were satisfied, so any JournalArticle will be displayed.
         
+Here is the code used to cover those rules.
 
-Here is my example of code used to cover those rules.
-
-I’ve used elasticSearch queries instead of conventional SQL in order to gain better performance.
+I’ve been used elasticSearch queries instead of conventional SQL in order to gain better performance.
 
 Source:
-[https://github.com/marceltanuri/content-segmentation-with-info-list-provider](https://github.com/marceltanuri/content-segmentation-with-info-list-provider) 
+[https://github.com/marceltanuri/content-segmentation-with-info-list-provider](https://github.com/marceltanuri/content-segmentation-with-info-list-provider)
 
 References:
 
