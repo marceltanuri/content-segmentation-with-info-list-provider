@@ -82,13 +82,13 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 
 		List<AssetEntry> taggedArticles = findTaggedArticles(infoListProviderContext);
 
-		if (taggedArticles != null && !taggedArticles.isEmpty()) {
+		if (isNullOrEmpty(taggedArticles)) {
 			return taggedArticles;
 		}
 
 		List<AssetEntry> globalArticles = findGlobalArticles(infoListProviderContext);
 
-		if (globalArticles != null && !globalArticles.isEmpty()) {
+		if (isNullOrEmpty(globalArticles)) {
 			return globalArticles;
 		}
 
@@ -237,6 +237,10 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 			}
 		}
 		return sb.append(")").toString();
+	}
+	
+	private boolean isNullOrEmpty(List<AssetEntry> entries) {
+	    	return entries == null || entries.isEmpty();
 	}
 
 	@Override
