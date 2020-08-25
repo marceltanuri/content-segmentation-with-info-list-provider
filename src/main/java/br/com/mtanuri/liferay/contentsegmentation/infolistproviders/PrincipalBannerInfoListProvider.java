@@ -11,6 +11,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.info.list.provider.InfoListProvider;
 import com.liferay.info.list.provider.InfoListProviderContext;
 import com.liferay.info.pagination.Pagination;
+import com.liferay.info.sort.Sort;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 
@@ -41,7 +42,7 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 
 	@Override
 	public List<AssetEntry> getInfoList(InfoListProviderContext infoListProviderContext, Pagination pagination,
-			com.liferay.info.sort.Sort sort) {
+			Sort sort) {
 		return assetEntryLocalService.getTopViewedEntries(new String[0], !sort.isReverse(), pagination.getStart(),
 				pagination.getEnd());
 	}
