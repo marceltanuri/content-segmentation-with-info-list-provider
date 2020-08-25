@@ -1,6 +1,7 @@
 package br.com.mtanuri.liferay.contentsegmentation.infolistproviders;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -83,34 +84,34 @@ public class JournalArticleService {
 	}
 
 	public List<AssetEntry> findTaggedArticles(long groupId, User user) {
+		List<AssetEntry> articles = Collections.emptyList();
+
 		if (user != null) {
 			List<AssetTag> userTags = assetTagLocalService.getTags(User.class.getName(), user.getUserId());
-			if (userTags == null || userTags.size() == 0) {
-				return null;
-			}
+			if (!isNullOrEmpty(userTags)) {
+				try {
 
-			try {
+					String[] tagNames = new String[userTags.size()];
+					for (int i = 0; i < userTags.size(); i++) {
+						AssetTag assetTag = userTags.get(i);
+						tagNames[i] = assetTag.getName();
+					}
 
-				String[] tagNames = new String[userTags.size()];
-				for (int i = 0; i < userTags.size(); i++) {
-					AssetTag assetTag = userTags.get(i);
-					tagNames[i] = assetTag.getName();
+					StringQuery assetTagNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
+					MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
+					MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
+					MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
+
+					RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
+
+					articles = getJournalArticles(userTags, groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
+							assetCategoryQuery, assetTagNamesQuery);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-
-				StringQuery assetTagNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
-				MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
-				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
-				MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
-
-				RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
-
-				return getJournalArticles(userTags, groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
-						assetCategoryQuery, assetTagNamesQuery);
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
-		return null;
+		return articles;
 	}
 
 	private String buildClauseOR(String field, String[] values) {
@@ -199,19 +200,22 @@ public class JournalArticleService {
 			// whitespaces and losing precision :(
 			for (AssetTag tag : tags) {
 				if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
-					AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS,
-							doc.getLong("entryClassPK"));
+					AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong("entryClassPK"));
 					articles.add(article);
 				}
 			}
 		}
 		return articles;
 	}
-	
+
 	private List<SearchHit> getSearcHits(SearchRequest searchRequest) {
 		SearchResponse searchResponse = searcher.search(searchRequest);
 		SearchHits searchHits = searchResponse.getSearchHits();
-		
+
 		return searchHits.getSearchHits();
+	}
+
+	private boolean isNullOrEmpty(List<AssetTag> entries) {
+		return entries == null || entries.isEmpty();
 	}
 }
