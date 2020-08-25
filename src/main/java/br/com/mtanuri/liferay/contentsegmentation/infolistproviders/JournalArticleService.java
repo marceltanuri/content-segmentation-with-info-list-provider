@@ -1,6 +1,7 @@
 package br.com.mtanuri.liferay.contentsegmentation.infolistproviders;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,7 +74,8 @@ public class JournalArticleService {
 		MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
 		RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 
-		return getJournalArticles(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery, assetCategoryQuery);
+		return getJournalArticles(Arrays.asList(ENTRY_CLASS_PK), null, groupIdQuery, entryClassNameQuery,
+				modifiedDateRangeQuery, assetCategoryQuery);
 	}
 
 	public List<AssetEntry> findTaggedArticles(long groupId, User user) {
@@ -96,8 +98,8 @@ public class JournalArticleService {
 
 				RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 
-				articles = getJournalArticles(userTags, groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
-						assetCategoryQuery, assetTagNamesQuery);
+				articles = getJournalArticles(Arrays.asList(ENTRY_CLASS_PK, ASSET_TAG_NAMES), userTags, groupIdQuery,
+						entryClassNameQuery, modifiedDateRangeQuery, assetCategoryQuery, assetTagNamesQuery);
 			}
 		}
 		return articles;
@@ -115,12 +117,12 @@ public class JournalArticleService {
 		return sb.append(")").toString();
 	}
 
-	private SearchRequestBuilder buildSearchRequestBuilder(boolean setAndSearch, String... fields) {
+	private SearchRequestBuilder buildSearchRequestBuilder(boolean setAndSearch, List<String> fields) {
 		SearchRequestBuilder searchRequestBuilder = searchRequestBuilderFactory.builder();
 
 		searchRequestBuilder.emptySearchEnabled(true);
 		searchRequestBuilder.entryClassNames(JOURNAL_CLASS);
-		searchRequestBuilder.fields(fields);
+		searchRequestBuilder.fields(fields.toArray(new String[fields.size()]));
 		searchRequestBuilder.sorts(sorts.field(MODIFIED_FIELD, SortOrder.DESC));
 
 		searchRequestBuilder.withSearchContext(searchContext -> {
@@ -139,23 +141,11 @@ public class JournalArticleService {
 				String.valueOf(currentTimeMillis));
 	}
 	
-	private List<AssetEntry> getJournalArticles(Query ... queries){
-		BooleanQuery booleanQuery = this.queries.booleanQuery();
-		booleanQuery.addMustQueryClauses(queries);
-
-		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
-		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
-
-		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
-		
-		return getJournalArticles(searchHitsList, null);
-	}
-	
-	private List<AssetEntry> getJournalArticles(List<AssetTag> tags, Query ... queries){
+	private List<AssetEntry> getJournalArticles(List<String> fields, List<AssetTag> tags, Query ... queries){
 		BooleanQuery booleanQuery = this.queries.booleanQuery();
 		booleanQuery.addMustQueryClauses(queries);
 		
-		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, ENTRY_CLASS_PK, ASSET_TAG_NAMES);
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, fields);
 		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
 		
 		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
