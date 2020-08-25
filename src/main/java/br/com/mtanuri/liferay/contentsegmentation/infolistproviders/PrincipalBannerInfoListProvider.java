@@ -1,5 +1,13 @@
 package br.com.mtanuri.liferay.contentsegmentation.infolistproviders;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -28,14 +36,6 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 
 /**
@@ -82,17 +82,7 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 
 		List<AssetEntry> taggedArticles = findTaggedArticles(infoListProviderContext);
 
-		if (isNullOrEmpty(taggedArticles)) {
-			return taggedArticles;
-		}
-
-		List<AssetEntry> globalArticles = findGlobalArticles(infoListProviderContext);
-
-		if (isNullOrEmpty(globalArticles)) {
-			return globalArticles;
-		}
-
-		return null;
+		return !isNullOrEmpty(taggedArticles) ? taggedArticles : findGlobalArticles(infoListProviderContext);
 	}
 
 	private List<AssetEntry> findTaggedArticles(InfoListProviderContext infoListProviderContext) {
