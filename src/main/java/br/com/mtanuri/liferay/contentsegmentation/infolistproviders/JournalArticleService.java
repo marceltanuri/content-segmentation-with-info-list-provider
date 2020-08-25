@@ -84,14 +84,7 @@ public class JournalArticleService {
 		if (user != null) {
 			List<AssetTag> userTags = assetTagLocalService.getTags(User.class.getName(), user.getUserId());
 			if (!isNullOrEmpty(userTags)) {
-
-				String[] tagNames = new String[userTags.size()];
-				for (int i = 0; i < userTags.size(); i++) {
-					AssetTag assetTag = userTags.get(i);
-					tagNames[i] = assetTag.getName();
-				}
-
-				StringQuery assetTagNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
+				StringQuery assetTagNamesQuery = queries.string(buildAssetTagClauseOR(ASSET_TAG_NAMES, userTags));
 				MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
 				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
 				MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
@@ -105,12 +98,12 @@ public class JournalArticleService {
 		return articles;
 	}
 
-	private String buildClauseOR(String field, String[] values) {
+	private String buildAssetTagClauseOR(String field, List<AssetTag> values) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(field + ":(");
-		for (int i = 0; i < values.length; i++) {
-			sb.append("\"").append(values[i]).append("\"");
-			if (i < values.length - 1) {
+		for (int i = 0; i < values.size(); i++) {
+			sb.append("\"").append(values.get(i)).append("\"");
+			if (i < values.size() - 1) {
 				sb.append(" OR ");
 			}
 		}
