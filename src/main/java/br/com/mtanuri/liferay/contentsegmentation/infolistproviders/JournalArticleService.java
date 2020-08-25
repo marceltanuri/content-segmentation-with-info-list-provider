@@ -155,7 +155,7 @@ public class JournalArticleService {
 		BooleanQuery booleanQuery = this.queries.booleanQuery();
 		booleanQuery.addMustQueryClauses(queries);
 		
-		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, ENTRY_CLASS_PK, ASSET_TAG_NAMES);
 		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
 		
 		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
