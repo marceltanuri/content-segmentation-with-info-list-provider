@@ -80,9 +80,7 @@ public class JournalArticleService {
 			SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
 			SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
 
-			SearchResponse searchResponse = searcher.search(searchRequest);
-			SearchHits searchHits = searchResponse.getSearchHits();
-			List<SearchHit> searchHitsList = searchHits.getSearchHits();
+			List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 
 			List<AssetEntry> articles = new ArrayList<AssetEntry>(10);
 
@@ -130,10 +128,7 @@ public class JournalArticleService {
 						ASSET_TAG_NAMES);
 
 				SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
-
-				SearchResponse searchResponse = searcher.search(searchRequest);
-				SearchHits searchHits = searchResponse.getSearchHits();
-				List<SearchHit> searchHitsList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 
 				List<AssetEntry> articles = new ArrayList<AssetEntry>(10);
 
@@ -196,5 +191,12 @@ public class JournalArticleService {
 
 		return queries.rangeTerm(MODIFIED_FIELD, true, true, String.valueOf(twoDaysAgoInMillis),
 				String.valueOf(currentTimeMillis));
+	}
+	
+	private List<SearchHit> getSearcHits(SearchRequest searchRequest) {
+		SearchResponse searchResponse = searcher.search(searchRequest);
+		SearchHits searchHits = searchResponse.getSearchHits();
+		
+		return searchHits.getSearchHits();
 	}
 }
