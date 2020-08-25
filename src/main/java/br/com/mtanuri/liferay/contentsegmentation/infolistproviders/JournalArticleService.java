@@ -67,20 +67,13 @@ public class JournalArticleService {
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
 
 	public List<AssetEntry> findGlobalArticles(long groupId) {
+		MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
 
-		try {
-			MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
+		MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
+		MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
+		RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 
-			MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
-			MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
-			RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
-
-			return getJournalArticles(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
-					assetCategoryQuery);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+		return getJournalArticles(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery, assetCategoryQuery);
 	}
 
 	public List<AssetEntry> findTaggedArticles(long groupId, User user) {
@@ -89,26 +82,22 @@ public class JournalArticleService {
 		if (user != null) {
 			List<AssetTag> userTags = assetTagLocalService.getTags(User.class.getName(), user.getUserId());
 			if (!isNullOrEmpty(userTags)) {
-				try {
 
-					String[] tagNames = new String[userTags.size()];
-					for (int i = 0; i < userTags.size(); i++) {
-						AssetTag assetTag = userTags.get(i);
-						tagNames[i] = assetTag.getName();
-					}
-
-					StringQuery assetTagNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
-					MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
-					MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
-					MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
-
-					RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
-
-					articles = getJournalArticles(userTags, groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
-							assetCategoryQuery, assetTagNamesQuery);
-				} catch (Exception e) {
-					e.printStackTrace();
+				String[] tagNames = new String[userTags.size()];
+				for (int i = 0; i < userTags.size(); i++) {
+					AssetTag assetTag = userTags.get(i);
+					tagNames[i] = assetTag.getName();
 				}
+
+				StringQuery assetTagNamesQuery = queries.string(buildClauseOR(ASSET_TAG_NAMES, tagNames));
+				MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
+				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
+				MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
+
+				RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
+
+				articles = getJournalArticles(userTags, groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
+						assetCategoryQuery, assetTagNamesQuery);
 			}
 		}
 		return articles;
