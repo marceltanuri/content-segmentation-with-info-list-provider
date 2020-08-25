@@ -143,10 +143,10 @@ public class JournalArticleService {
 		
 		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 		
-		return getJournalArticles(searchHitsList, tags);
+		return convertSearchHitIntoAssetEntry(searchHitsList, tags);
 	}
 	
-	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList, List<AssetTag> tags) {
+	private List<AssetEntry> convertSearchHitIntoAssetEntry(List<SearchHit> searchHitsList, List<AssetTag> tags) {
 		List<AssetEntry> articles = new ArrayList<>(10);
 		
 		for (SearchHit searchHit : searchHitsList) {
