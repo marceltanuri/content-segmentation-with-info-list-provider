@@ -34,8 +34,8 @@ import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
 
-@Component(service = JournalArticleService.class)
-public class JournalArticleService {
+@Component(service = JournalArticleSearch.class)
+public class JournalArticleSearch {
 
 	private static final String GLOBAL = "global";
 	private static final String GROUP_FIELD = "groupId";
@@ -47,7 +47,7 @@ public class JournalArticleService {
 	private static final String ENTRY_CLASS_NAME = "entryClassName";
 	private static final String ENTRY_CLASS_PK = "entryClassPK";
 
-	private Log log = LogFactoryUtil.getLog(JournalArticleService.class);
+	private Log log = LogFactoryUtil.getLog(JournalArticleSearch.class);
 
 	@Reference
 	private AssetEntryLocalService assetEntryLocalService;

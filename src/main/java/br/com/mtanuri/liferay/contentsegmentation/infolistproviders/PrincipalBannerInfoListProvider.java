@@ -27,7 +27,7 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 	private AssetEntryLocalService assetEntryLocalService;
 
 	@Reference
-	private JournalArticleService journalArticleService;
+	private JournalArticleSearch journalArticleService;
 
 	@Override
 	public List<AssetEntry> getInfoList(InfoListProviderContext infoListProviderContext) {
