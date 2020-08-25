@@ -12,6 +12,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -42,7 +43,6 @@ public class JournalArticleService {
 	private static final String ASSET_CATEGORY_FIELD = "assetCategoryTitles_pt_BR";
 	private static final long _48_HOURS_IN_MILLIS = 172800000L;
 	private static final String MODIFIED_FIELD = "modified_sortable";
-	private static final String JOURNAL_CLASS = "com.liferay.journal.model.JournalArticle";
 	private static final String ASSET_TAG_NAMES = "assetTagNames";
 	private static final String ENTRY_CLASS_NAME = "entryClassName";
 	private static final String ENTRY_CLASS_PK = "entryClassPK";
@@ -70,7 +70,7 @@ public class JournalArticleService {
 	public List<AssetEntry> findGlobalArticles(long groupId) {
 		MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
 
-		MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
+		MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JournalArticle.class.getName());
 		MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
 		RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 
@@ -86,7 +86,7 @@ public class JournalArticleService {
 			if (!isNullOrEmpty(userTags)) {
 				StringQuery assetTagNamesQuery = queries.string(buildAssetTagClauseOR(ASSET_TAG_NAMES, userTags));
 				MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
-				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
+				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JournalArticle.class.getName());
 				MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
 
 				RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
@@ -114,7 +114,7 @@ public class JournalArticleService {
 		SearchRequestBuilder searchRequestBuilder = searchRequestBuilderFactory.builder();
 
 		searchRequestBuilder.emptySearchEnabled(true);
-		searchRequestBuilder.entryClassNames(JOURNAL_CLASS);
+		searchRequestBuilder.entryClassNames(JournalArticle.class.getName());
 		searchRequestBuilder.fields(fields.toArray(new String[fields.size()]));
 		searchRequestBuilder.sorts(sorts.field(MODIFIED_FIELD, SortOrder.DESC));
 
@@ -148,12 +148,12 @@ public class JournalArticleService {
 			if(!isNullOrEmpty(tags)) {
 				for (AssetTag tag : tags) {
 					if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
-						AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
+						AssetEntry article = assetEntryLocalService.fetchEntry(JournalArticle.class.getName(), doc.getLong(ENTRY_CLASS_PK));
 						articles.add(article);
 					}
 				}
 			}else {
-				AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
+				AssetEntry article = assetEntryLocalService.fetchEntry(JournalArticle.class.getName(), doc.getLong(ENTRY_CLASS_PK));
 				articles.add(article);
 			}
 		}
