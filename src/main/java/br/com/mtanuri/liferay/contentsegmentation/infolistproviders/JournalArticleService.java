@@ -50,22 +50,22 @@ public class JournalArticleService {
 	private Log log = LogFactoryUtil.getLog(JournalArticleService.class);
 
 	@Reference
-	AssetEntryLocalService assetEntryLocalService;
+	private AssetEntryLocalService assetEntryLocalService;
 
 	@Reference
-	AssetTagLocalService assetTagLocalService;
+	private AssetTagLocalService assetTagLocalService;
 
 	@Reference
 	protected Queries queries;
-
-	@Reference
-	protected Sorts sorts;
 
 	@Reference
 	protected Searcher searcher;
 
 	@Reference
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
+	
+	@Reference
+	protected Sorts sorts;
 
 	public List<AssetEntry> findGlobalArticles(long groupId) {
 		MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
