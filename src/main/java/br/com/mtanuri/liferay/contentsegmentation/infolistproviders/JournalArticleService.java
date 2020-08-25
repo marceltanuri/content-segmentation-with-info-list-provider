@@ -82,16 +82,7 @@ public class JournalArticleService {
 
 			List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 
-			List<AssetEntry> articles = new ArrayList<AssetEntry>(10);
-
-			for (SearchHit searchHit : searchHitsList) {
-				Document doc = searchHit.getDocument();
-				log.debug("classPK: " + doc.getLong(ENTRY_CLASS_PK));
-				AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
-				articles.add(article);
-				return articles;
-			}
-
+			return getJournalArticles(searchHitsList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -130,25 +121,7 @@ public class JournalArticleService {
 				SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
 				List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 
-				List<AssetEntry> articles = new ArrayList<AssetEntry>(10);
-
-				for (SearchHit searchHit : searchHitsList) {
-
-					Document doc = searchHit.getDocument();
-					log.debug("classPK: " + doc.getLong(ENTRY_CLASS_PK));
-
-					// verify if tags has the exact same name, elastic search is
-					// breaking
-					// whitespaces and losing precision :(
-					for (String string : tagNames) {
-						if (doc.getValues(ASSET_TAG_NAMES).contains(string)) {
-							AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS,
-									doc.getLong("entryClassPK"));
-							articles.add(article);
-							return articles;
-						}
-					}
-				}
+				return getJournalArticles(searchHitsList, tagNames);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -191,6 +164,41 @@ public class JournalArticleService {
 
 		return queries.rangeTerm(MODIFIED_FIELD, true, true, String.valueOf(twoDaysAgoInMillis),
 				String.valueOf(currentTimeMillis));
+	}
+	
+	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList){
+		List<AssetEntry> articles = new ArrayList<>(searchHitsList.size());
+		
+		for (SearchHit searchHit : searchHitsList) {
+			Document doc = searchHit.getDocument();
+			log.debug("classPK: " + doc.getLong(ENTRY_CLASS_PK));
+			AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
+			articles.add(article);
+		}
+		
+		return articles;
+	}
+	
+	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList, String ...tagNames) {
+		List<AssetEntry> articles = new ArrayList<>(10);
+		
+		for (SearchHit searchHit : searchHitsList) {
+
+			Document doc = searchHit.getDocument();
+			log.debug("classPK: " + doc.getLong(ENTRY_CLASS_PK));
+
+			// verify if tags has the exact same name, elastic search is
+			// breaking
+			// whitespaces and losing precision :(
+			for (String string : tagNames) {
+				if (doc.getValues(ASSET_TAG_NAMES).contains(string)) {
+					AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS,
+							doc.getLong("entryClassPK"));
+					articles.add(article);
+				}
+			}
+		}
+		return articles;
 	}
 	
 	private List<SearchHit> getSearcHits(SearchRequest searchRequest) {
