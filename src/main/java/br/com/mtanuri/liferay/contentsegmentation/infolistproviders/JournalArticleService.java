@@ -134,26 +134,14 @@ public class JournalArticleService {
 				String.valueOf(currentTimeMillis));
 	}
 	
-	private List<AssetEntry> getJournalArticles(List<String> fields, List<AssetTag> tags, Query ... queries){
-		BooleanQuery booleanQuery = this.queries.booleanQuery();
-		booleanQuery.addMustQueryClauses(queries);
-		
-		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, fields);
-		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
-		
-		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
-		
-		return convertSearchHitIntoAssetEntry(searchHitsList, tags);
-	}
-	
 	private List<AssetEntry> convertSearchHitIntoAssetEntry(List<SearchHit> searchHitsList, List<AssetTag> tags) {
 		List<AssetEntry> articles = new ArrayList<>(10);
 		
 		for (SearchHit searchHit : searchHitsList) {
-
+			
 			Document doc = searchHit.getDocument();
 			log.debug("classPK: " + doc.getLong(ENTRY_CLASS_PK));
-
+			
 			// verify if tags has the exact same name, elastic search is
 			// breaking
 			// whitespaces and losing precision :(
@@ -170,6 +158,18 @@ public class JournalArticleService {
 			}
 		}
 		return articles;
+	}
+	
+	private List<AssetEntry> getJournalArticles(List<String> fields, List<AssetTag> tags, Query ... queries){
+		BooleanQuery booleanQuery = this.queries.booleanQuery();
+		booleanQuery.addMustQueryClauses(queries);
+		
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, fields);
+		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
+		
+		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
+		
+		return convertSearchHitIntoAssetEntry(searchHitsList, tags);
 	}
 
 	private List<SearchHit> getSearcHits(SearchRequest searchRequest) {
