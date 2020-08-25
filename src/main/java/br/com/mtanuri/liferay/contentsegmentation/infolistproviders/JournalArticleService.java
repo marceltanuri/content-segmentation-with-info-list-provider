@@ -104,18 +104,8 @@ public class JournalArticleService {
 
 				RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 
-				BooleanQuery booleanQuery = queries.booleanQuery();
-				booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
+				return getJournalArticles(userTags, groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
 						assetCategoryQuery, assetTagNamesQuery);
-
-				SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, ENTRY_CLASS_PK,
-						ASSET_TAG_NAMES);
-
-				SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
-				List<SearchHit> searchHitsList = getSearcHits(searchRequest);
-
-				return getJournalArticles(searchHitsList, tagNames);
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -159,7 +149,6 @@ public class JournalArticleService {
 				String.valueOf(currentTimeMillis));
 	}
 	
-	
 	private List<AssetEntry> getJournalArticles(Query ... queries){
 		BooleanQuery booleanQuery = this.queries.booleanQuery();
 		booleanQuery.addMustQueryClauses(queries);
@@ -170,6 +159,18 @@ public class JournalArticleService {
 		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 		
 		return getJournalArticles(searchHitsList);
+	}
+	
+	private List<AssetEntry> getJournalArticles(List<AssetTag> tags, Query ... queries){
+		BooleanQuery booleanQuery = this.queries.booleanQuery();
+		booleanQuery.addMustQueryClauses(queries);
+		
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
+		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
+		
+		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
+		
+		return getJournalArticles(searchHitsList, tags);
 	}
 	
 	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList){
@@ -185,7 +186,7 @@ public class JournalArticleService {
 		return articles;
 	}
 	
-	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList, String ...tagNames) {
+	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList, List<AssetTag> tags) {
 		List<AssetEntry> articles = new ArrayList<>(10);
 		
 		for (SearchHit searchHit : searchHitsList) {
@@ -196,8 +197,8 @@ public class JournalArticleService {
 			// verify if tags has the exact same name, elastic search is
 			// breaking
 			// whitespaces and losing precision :(
-			for (String string : tagNames) {
-				if (doc.getValues(ASSET_TAG_NAMES).contains(string)) {
+			for (AssetTag tag : tags) {
+				if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
 					AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS,
 							doc.getLong("entryClassPK"));
 					articles.add(article);
