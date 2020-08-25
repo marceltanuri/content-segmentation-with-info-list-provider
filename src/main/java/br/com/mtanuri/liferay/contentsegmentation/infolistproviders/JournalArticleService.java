@@ -148,7 +148,7 @@ public class JournalArticleService {
 
 		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
 		
-		return getJournalArticles(searchHitsList);
+		return getJournalArticles(searchHitsList, null);
 	}
 	
 	private List<AssetEntry> getJournalArticles(List<AssetTag> tags, Query ... queries){
@@ -163,19 +163,6 @@ public class JournalArticleService {
 		return getJournalArticles(searchHitsList, tags);
 	}
 	
-	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList){
-		List<AssetEntry> articles = new ArrayList<>(searchHitsList.size());
-		
-		for (SearchHit searchHit : searchHitsList) {
-			Document doc = searchHit.getDocument();
-			log.debug("classPK: " + doc.getLong(ENTRY_CLASS_PK));
-			AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
-			articles.add(article);
-		}
-		
-		return articles;
-	}
-	
 	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList, List<AssetTag> tags) {
 		List<AssetEntry> articles = new ArrayList<>(10);
 		
@@ -187,11 +174,16 @@ public class JournalArticleService {
 			// verify if tags has the exact same name, elastic search is
 			// breaking
 			// whitespaces and losing precision :(
-			for (AssetTag tag : tags) {
-				if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
-					AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong("entryClassPK"));
-					articles.add(article);
+			if(!isNullOrEmpty(tags)) {
+				for (AssetTag tag : tags) {
+					if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
+						AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong("entryClassPK"));
+						articles.add(article);
+					}
 				}
+			}else {
+				AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong("entryClassPK"));
+				articles.add(article);
 			}
 		}
 		return articles;
