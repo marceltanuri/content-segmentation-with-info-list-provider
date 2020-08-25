@@ -37,10 +37,6 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 				: journalArticleService.findGlobalArticles(infoListProviderContext);
 	}
 
-	private boolean isNullOrEmpty(List<AssetEntry> entries) {
-			return entries == null || entries.isEmpty();
-	}
-
 	@Override
 	public List<AssetEntry> getInfoList(InfoListProviderContext infoListProviderContext, Pagination pagination,
 			com.liferay.info.sort.Sort sort) {
@@ -58,5 +54,9 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 	@Override
 	public String getLabel(Locale locale) {
 		return INFO_LIST_PROVIDER_NAME;
+	}
+
+	private boolean isNullOrEmpty(List<AssetEntry> entries) {
+		return entries == null || entries.isEmpty();
 	}
 }
