@@ -20,6 +20,7 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.MatchQuery;
 import com.liferay.portal.search.query.Queries;
+import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.query.RangeTermQuery;
 import com.liferay.portal.search.query.StringQuery;
 import com.liferay.portal.search.searcher.SearchRequest;
@@ -67,22 +68,14 @@ public class JournalArticleService {
 	public List<AssetEntry> findGlobalArticles(long groupId) {
 
 		try {
-
 			MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
 
 			MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
 			MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
 			RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
-			BooleanQuery booleanQuery = queries.booleanQuery();
-			booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
+
+			return getJournalArticles(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
 					assetCategoryQuery);
-
-			SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
-			SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
-
-			List<SearchHit> searchHitsList = getSearcHits(searchRequest);
-
-			return getJournalArticles(searchHitsList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -164,6 +157,19 @@ public class JournalArticleService {
 
 		return queries.rangeTerm(MODIFIED_FIELD, true, true, String.valueOf(twoDaysAgoInMillis),
 				String.valueOf(currentTimeMillis));
+	}
+	
+	
+	private List<AssetEntry> getJournalArticles(Query ... queries){
+		BooleanQuery booleanQuery = this.queries.booleanQuery();
+		booleanQuery.addMustQueryClauses(queries);
+
+		SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
+		SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
+
+		List<SearchHit> searchHitsList = getSearcHits(searchRequest);
+		
+		return getJournalArticles(searchHitsList);
 	}
 	
 	private List<AssetEntry> getJournalArticles(List<SearchHit> searchHitsList){
