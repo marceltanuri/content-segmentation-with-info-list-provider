@@ -2,7 +2,6 @@ package br.com.mtanuri.liferay.contentsegmentation.infolistproviders;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -11,10 +10,8 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
-import com.liferay.info.list.provider.InfoListProviderContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.document.Document;
@@ -67,12 +64,11 @@ public class JournalArticleService {
 	@Reference
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
 
-	public List<AssetEntry> findGlobalArticles(InfoListProviderContext infoListProviderContext) {
+	public List<AssetEntry> findGlobalArticles(long groupId) {
 
 		try {
 
-			MatchQuery groupIdQuery = queries.match(GROUP_FIELD,
-					String.valueOf(infoListProviderContext.getGroupOptional().get().getGroupId()));
+			MatchQuery groupIdQuery = queries.match(GROUP_FIELD, String.valueOf(groupId));
 
 			MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
 			MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
@@ -120,12 +116,7 @@ public class JournalArticleService {
 		return null;
 	}
 
-	public List<AssetEntry> findTaggedArticles(InfoListProviderContext infoListProviderContext) {
-		User user = infoListProviderContext.getUser();
-
-		Optional<Group> groupOptional = infoListProviderContext.getGroupOptional();
-		long groupId = groupOptional.get().getGroupId();
-
+	public List<AssetEntry> findTaggedArticles(long groupId, User user) {
 		if (user != null) {
 			List<AssetTag> userTags = assetTagLocalService.getTags(User.class.getName(), user.getUserId());
 			if (userTags == null || userTags.size() == 0) {

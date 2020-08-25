@@ -12,6 +12,7 @@ import com.liferay.info.list.provider.InfoListProvider;
 import com.liferay.info.list.provider.InfoListProviderContext;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 
 /**
  * @author marceltanuri
@@ -30,11 +31,12 @@ public class PrincipalBannerInfoListProvider implements InfoListProvider<AssetEn
 
 	@Override
 	public List<AssetEntry> getInfoList(InfoListProviderContext infoListProviderContext) {
+		long groupId = infoListProviderContext.getGroupOptional().get().getGroupId();
+		User user = infoListProviderContext.getUser();
 
-		List<AssetEntry> taggedArticles = journalArticleService.findTaggedArticles(infoListProviderContext);
+		List<AssetEntry> taggedArticles = journalArticleService.findTaggedArticles(groupId, user);
 
-		return !isNullOrEmpty(taggedArticles) ? taggedArticles
-				: journalArticleService.findGlobalArticles(infoListProviderContext);
+		return !isNullOrEmpty(taggedArticles) ? taggedArticles : journalArticleService.findGlobalArticles(groupId);
 	}
 
 	@Override
