@@ -72,13 +72,7 @@ public class JournalArticleService {
 
 			MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
 			MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, GLOBAL);
-
-			long currentTimeMillis = System.currentTimeMillis();
-			long twoDaysAgoInMillis = currentTimeMillis - (_48_HOURS_IN_MILLIS);
-
-			RangeTermQuery modifiedDateRangeQuery = queries.rangeTerm(MODIFIED_FIELD, true, true,
-					String.valueOf(twoDaysAgoInMillis), String.valueOf(currentTimeMillis));
-
+			RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 			BooleanQuery booleanQuery = queries.booleanQuery();
 			booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
 					assetCategoryQuery);
@@ -136,11 +130,7 @@ public class JournalArticleService {
 				MatchQuery entryClassNameQuery = queries.match(ENTRY_CLASS_NAME, JOURNAL_CLASS);
 				MatchQuery assetCategoryQuery = queries.match(ASSET_CATEGORY_FIELD, SEGMENTADO);
 
-				long currentTimeMillis = System.currentTimeMillis();
-				long twoDaysAgoInMillis = currentTimeMillis - (_48_HOURS_IN_MILLIS);
-
-				RangeTermQuery modifiedDateRangeQuery = queries.rangeTerm(MODIFIED_FIELD, true, true,
-						String.valueOf(twoDaysAgoInMillis), String.valueOf(currentTimeMillis));
+				RangeTermQuery modifiedDateRangeQuery = buildTwoDaysAgoRangeTermQuery();
 
 				BooleanQuery booleanQuery = queries.booleanQuery();
 				booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
@@ -201,5 +191,13 @@ public class JournalArticleService {
 			}
 		}
 		return sb.append(")").toString();
+	}
+
+	private RangeTermQuery buildTwoDaysAgoRangeTermQuery() {
+		long currentTimeMillis = System.currentTimeMillis();
+		long twoDaysAgoInMillis = currentTimeMillis - (_48_HOURS_IN_MILLIS);
+
+		return queries.rangeTerm(MODIFIED_FIELD, true, true, String.valueOf(twoDaysAgoInMillis),
+				String.valueOf(currentTimeMillis));
 	}
 }
