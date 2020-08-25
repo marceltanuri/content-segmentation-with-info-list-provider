@@ -134,7 +134,16 @@ public class JournalArticleService {
 				String.valueOf(currentTimeMillis));
 	}
 	
-	private List<AssetEntry> convertSearchHitIntoAssetEntry(List<SearchHit> searchHitsList, List<AssetTag> tags) {
+	private boolean containsUserTags(List<AssetTag> userTags, List<Object> list) {
+		for (AssetTag tag : userTags) {
+			if (list.contains(tag.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private List<AssetEntry> convertSearchHitIntoAssetEntry(List<SearchHit> searchHitsList, List<AssetTag> userTags) {
 		List<AssetEntry> articles = new ArrayList<>(10);
 		
 		for (SearchHit searchHit : searchHitsList) {
@@ -145,15 +154,11 @@ public class JournalArticleService {
 			// verify if tags has the exact same name, elastic search is
 			// breaking
 			// whitespaces and losing precision :(
-			if(!isNullOrEmpty(tags)) {
-				for (AssetTag tag : tags) {
-					if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
-						AssetEntry article = assetEntryLocalService.fetchEntry(JournalArticle.class.getName(), doc.getLong(ENTRY_CLASS_PK));
-						articles.add(article);
-					}
-				}
-			}else {
-				AssetEntry article = assetEntryLocalService.fetchEntry(JournalArticle.class.getName(), doc.getLong(ENTRY_CLASS_PK));
+			if (isNullOrEmpty(userTags)
+					|| (!isNullOrEmpty(userTags) && containsUserTags(userTags, doc.getValues(ASSET_TAG_NAMES)))) {
+				
+				AssetEntry article = assetEntryLocalService.fetchEntry(JournalArticle.class.getName(),
+						doc.getLong(ENTRY_CLASS_PK));
 				articles.add(article);
 			}
 		}
