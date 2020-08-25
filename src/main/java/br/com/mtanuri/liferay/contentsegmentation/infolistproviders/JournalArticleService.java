@@ -177,12 +177,12 @@ public class JournalArticleService {
 			if(!isNullOrEmpty(tags)) {
 				for (AssetTag tag : tags) {
 					if (doc.getValues(ASSET_TAG_NAMES).contains(tag.getName())) {
-						AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong("entryClassPK"));
+						AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
 						articles.add(article);
 					}
 				}
 			}else {
-				AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong("entryClassPK"));
+				AssetEntry article = assetEntryLocalService.fetchEntry(JOURNAL_CLASS, doc.getLong(ENTRY_CLASS_PK));
 				articles.add(article);
 			}
 		}
