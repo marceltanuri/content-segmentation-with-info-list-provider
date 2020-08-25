@@ -77,17 +77,7 @@ public class JournalArticleService {
 			booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
 					assetCategoryQuery);
 
-			SearchRequestBuilder searchRequestBuilder = searchRequestBuilderFactory.builder();
-
-			searchRequestBuilder.emptySearchEnabled(true);
-			searchRequestBuilder.entryClassNames(JOURNAL_CLASS);
-			searchRequestBuilder.fields(ENTRY_CLASS_PK);
-			searchRequestBuilder.sorts(sorts.field(MODIFIED_FIELD, SortOrder.DESC));
-
-			searchRequestBuilder.withSearchContext(searchContext -> {
-				searchContext.setCompanyId(PortalUtil.getDefaultCompanyId());
-			});
-
+			SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(false, ENTRY_CLASS_PK);
 			SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
 
 			SearchResponse searchResponse = searcher.search(searchRequest);
@@ -136,17 +126,8 @@ public class JournalArticleService {
 				booleanQuery.addMustQueryClauses(groupIdQuery, entryClassNameQuery, modifiedDateRangeQuery,
 						assetCategoryQuery, assetTagNamesQuery);
 
-				SearchRequestBuilder searchRequestBuilder = searchRequestBuilderFactory.builder();
-
-				searchRequestBuilder.emptySearchEnabled(true);
-				searchRequestBuilder.entryClassNames(JOURNAL_CLASS);
-				searchRequestBuilder.fields(ENTRY_CLASS_PK, ASSET_TAG_NAMES);
-				searchRequestBuilder.sorts(sorts.field(MODIFIED_FIELD, SortOrder.DESC));
-
-				searchRequestBuilder.withSearchContext(searchContext -> {
-					searchContext.setCompanyId(PortalUtil.getDefaultCompanyId());
-					searchContext.setAndSearch(true);
-				});
+				SearchRequestBuilder searchRequestBuilder = buildSearchRequestBuilder(true, ENTRY_CLASS_PK,
+						ASSET_TAG_NAMES);
 
 				SearchRequest searchRequest = searchRequestBuilder.query(booleanQuery).build();
 
@@ -191,6 +172,22 @@ public class JournalArticleService {
 			}
 		}
 		return sb.append(")").toString();
+	}
+
+	private SearchRequestBuilder buildSearchRequestBuilder(boolean setAndSearch, String... fields) {
+		SearchRequestBuilder searchRequestBuilder = searchRequestBuilderFactory.builder();
+
+		searchRequestBuilder.emptySearchEnabled(true);
+		searchRequestBuilder.entryClassNames(JOURNAL_CLASS);
+		searchRequestBuilder.fields(fields);
+		searchRequestBuilder.sorts(sorts.field(MODIFIED_FIELD, SortOrder.DESC));
+
+		searchRequestBuilder.withSearchContext(searchContext -> {
+			searchContext.setCompanyId(PortalUtil.getDefaultCompanyId());
+			searchContext.setAndSearch(setAndSearch);
+		});
+
+		return searchRequestBuilder;
 	}
 
 	private RangeTermQuery buildTwoDaysAgoRangeTermQuery() {
