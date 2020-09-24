@@ -11,11 +11,11 @@ Here is a real world scenario of content segmentation:
     
 -   Rules:
     
-    -   1. Find the most recent JournalArticle where at least one of its tags matches with at least one of the tags of the logged user
+    -   1. Find the most recent JournalArticle. At least one of its tags must to match with at least one of the tags of the logged user.
         
-    -   2. If there is no JournalArticle in the filter above, so find the most recent JournalArticle with the assetCategoryTitle = 'global'.
+    -   2. If there is no JournalArticle in the filter above, so find the most recent JournalArticle set by public for everyone.
         
-    -   3. In the two filters above, it is only be accepted JournalArticles that have been published in the last 48 hours.
+    -   3. Important: In the two filters above, it is only be accepted JournalArticles that have been published in the last 48 hours.
         
     -   4. If any of the conditions above were satisfied, so any JournalArticle will be displayed.
         
